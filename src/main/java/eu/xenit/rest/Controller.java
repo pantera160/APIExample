@@ -2,22 +2,16 @@ package eu.xenit.rest;
 
 import com.mashape.unirest.http.HttpResponse;
 import com.mashape.unirest.http.JsonNode;
-import com.mashape.unirest.http.ObjectMapper;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.xenit.utils.Utils;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Component;
-import org.json.simple.JSONObject;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.ArrayList;
 
 /**
@@ -115,13 +109,13 @@ public class Controller {
         String parentRef = ((JSONArray) responseJSON.get("noderefs")).get(0).toString();
 
 
-        JSONObject propjson = (JSONObject) parser.parse(properties);
 
         body = new JSONObject();
         body.put("parent", parentRef);
         body.put("name", name);
         body.put("type", type);
         if(properties != null){
+            JSONObject propjson = (JSONObject) parser.parse(properties);
             body.put("properties", propjson);
         }
         response = execute(body, "apix/v1/nodes", "POST");
