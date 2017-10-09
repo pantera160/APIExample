@@ -55,10 +55,17 @@ public class Controller {
             JSONObject pathjson = new JSONObject();
             pathjson.put("path", "/cm:categoryRoot/vdl:vdlmission/*");
             JSONArray and = new JSONArray();
-            and.add("{\"property\":{\"name\":\"cm:name\",\"value\":\"" + mission + "\",\"exact\":true}}");
+            JSONObject andprop = new JSONObject();
+            JSONObject prop = new JSONObject();
+            prop.put("name", "cm:name");
+            prop.put("value", mission);
+            prop.put("exact", true);
+            andprop.put("property", prop);
+            and.add(andprop);
             and.add(pathjson);
             query.put("and", and);
             body.put("query", query);
+            System.out.println(body);
             String response = execute(body, "apix/v1/search", "POST");
             JSONParser parser = new JSONParser();
             JSONObject responseJSON = (JSONObject) parser.parse(response);
@@ -101,22 +108,24 @@ public class Controller {
         JSONObject query = new JSONObject();
         query.put("path", path);
         body.put("query", query);
+        System.out.println(body);
         String response = execute(body, "apix/v1/search", "POST");
         JSONParser parser = new JSONParser();
         JSONObject responseJSON = (JSONObject) parser.parse(response);
         String parentRef = ((JSONArray) responseJSON.get("noderefs")).get(0).toString();
 
 
-
+        JSONObject propjson = (JSONObject) parser.parse(properties);
 
         body = new JSONObject();
         body.put("parent", parentRef);
         body.put("name", name);
         body.put("type", type);
         if(properties != null){
-            body.put("properties", properties);
+            body.put("properties", propjson);
         }
         response = execute(body, "apix/v1/nodes", "POST");
+        System.out.println(response);
         responseJSON =(JSONObject) parser.parse(response);
         String nodeRef = ((JSONObject) responseJSON.get("metadata")).get("id").toString();
 

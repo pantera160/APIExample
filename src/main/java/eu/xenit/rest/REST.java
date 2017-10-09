@@ -51,7 +51,7 @@ public class REST {
 
     @RequestMapping("/5")
     public String createDocWithCats() throws ParseException, UnirestException, IOException {
-        return controller.createDocWithProp("/app:Company_Home/cm:VDL", "New Test Doc", "{http://vdl.liege.be/model/content/1.0}documentrole", "{\"vdl:vdlmission\":[\"ref\", \"ref2\"]}");
+        return controller.createDocWithProp("/app:company_home/cm:VDL", "This is a testdoc", "{http://vdl.liege.be/model/content/1.0/fin}documentrole", "{\"vdl:vdlmission\":[\"workspace://SpacesStore/d416c8bf-1d28-498b-8441-da836092dd46\", \"workspace://SpacesStore/ef77181f-034a-46cb-b2fb-c8fc30c43593\"]}");
     }
 
     @RequestMapping("/6")
