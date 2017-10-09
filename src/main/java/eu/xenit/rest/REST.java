@@ -21,7 +21,7 @@ public class REST {
 
     @RequestMapping("/1")
     public String createNewDocumentExample() throws ParseException, UnirestException, IOException {
-        return controller.createNewDoc("/app:Company_Home/cm:VDL", "New Test Doc", "{http://www.alfresco.org/model/content/1.0}content");
+        return controller.createNewDoc("/app:company_home/cm:VDL", "New Test Doc", "{http://www.alfresco.org/model/content/1.0}content");
     }
 
     @RequestMapping("/2")
