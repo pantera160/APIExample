@@ -3,9 +3,11 @@ package eu.xenit.rest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
 /**
@@ -21,7 +23,16 @@ public class REST {
 
     @RequestMapping("/1")
     public String createNewDocumentExample() throws ParseException, UnirestException, IOException {
-        return controller.createNewDoc("/app:company_home/cm:VDL", "New Test Doc", "{http://www.alfresco.org/model/content/1.0}content");
+        return createNewDocumentExample("New Test Doc");
+    }
+
+    @RequestMapping("/1/{name}")
+    public String createNewDocumentExample(@PathVariable(value = "name", required = false)
+                                               @NotNull final String name) throws
+            ParseException,
+            UnirestException, IOException {
+        return controller.createNewDoc("/app:company_home/cm:VDL", name,
+                "{http://www.alfresco.org/model/content/1.0}content");
     }
 
     @RequestMapping("/2")
