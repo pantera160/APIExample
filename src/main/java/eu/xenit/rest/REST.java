@@ -1,6 +1,7 @@
 package eu.xenit.rest;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
+import eu.xenit.utils.Utils;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -21,7 +22,7 @@ public class REST {
 
     @RequestMapping("/1")
     public String createNewDocumentExample() throws ParseException, UnirestException, IOException {
-        return controller.createNewDoc("/app:Company_Home/cm:VDL", "New Test Doc", "{http://www.alfresco.org/model/content/1.0}content");
+        return controller.createNewDoc("/app:company_home/cm:VDL", "NewContentUploadTest", "{http://www.alfresco.org/model/content/1.0}content");
     }
 
     @RequestMapping("/2")
@@ -46,17 +47,24 @@ public class REST {
 
     @RequestMapping("/4")
     public String getCategorieRefs() throws ParseException, UnirestException, IOException {
-        return controller.getCathRefs("Contrôle interne,Stratégie,Logement");
+        return controller.getCathRefs("Contrôle interne");
     }
 
     @RequestMapping("/5")
     public String createDocWithCats() throws ParseException, UnirestException, IOException {
-        return controller.createDocWithProp("/app:company_home/cm:VDL", "This is a testdoc", "{http://vdl.liege.be/model/content/1.0/fin}documentrole", "{\"vdl:vdlmission\":[\"workspace://SpacesStore/d416c8bf-1d28-498b-8441-da836092dd46\", \"workspace://SpacesStore/ef77181f-034a-46cb-b2fb-c8fc30c43593\"]}");
+        String catids = controller.getCathRefs("Contrôle interne,Stratégie,Logement");
+        return controller.createDocWithProp("/app:company_home/cm:VDL", "ODCatTestDoc4", "{http://vdl.liege.be/model/content/1.0/fin}documentrole", "{\"vdl:vdlmissionprop\":[" + Utils.reformat(catids) + "]}");
     }
 
     @RequestMapping("/6")
     public String setNewMetadata() throws ParseException, UnirestException, IOException {
         return controller.setMetadata("workspace://SpacesStore/c8d668f6-ae63-47e0-bb95-435da673b8a8");
+    }
+
+    @RequestMapping("/7")
+    public String setContent() throws ParseException, UnirestException, IOException {
+        String nodeRef = this.createNewDocumentExample();
+        return controller.setContent(nodeRef,"D://out.xml");
     }
 
 
