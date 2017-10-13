@@ -16,4 +16,15 @@ public class Utils {
         String guid = split2[1];
         return new String[]{space, store, guid};
     }
+
+    public static String reformat(String catids){
+        catids = catids.substring(0,catids.lastIndexOf(","));
+        String res = "";
+        for (String cat : catids.split(",")) {
+            res += "\""+cat.trim()+"\",";
+        }
+        System.out.println(res.substring(0,res.lastIndexOf(",")));
+        return res.substring(0,res.lastIndexOf(","));
+    }
+
 }
