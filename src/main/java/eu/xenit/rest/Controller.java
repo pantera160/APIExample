@@ -13,11 +13,15 @@ import org.springframework.stereotype.Component;
 import org.json.simple.JSONObject;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 
 /**
@@ -96,7 +100,6 @@ public class Controller {
         JSONParser parser = new JSONParser();
         String url = "apix/v1/nodes/"+splitRef[0]+"/"+splitRef[1]+"/"+splitRef[2]+"/metadata";
         String JSONString = "{\n" +
-                "  \"aspectsToAdd\": [\"{http://www.alfresco.org/model/system/1.0}temporary\"],\n" +
                 "  \"propertiesToSet\": {\"{http://www.alfresco.org/model/content/1.0}title\":[\"My new title\"]}\n" +
                 "}";
         JSONObject body = (JSONObject) parser.parse(JSONString);
@@ -115,13 +118,14 @@ public class Controller {
         String parentRef = ((JSONArray) responseJSON.get("noderefs")).get(0).toString();
 
 
-        JSONObject propjson = (JSONObject) parser.parse(properties);
+
 
         body = new JSONObject();
         body.put("parent", parentRef);
         body.put("name", name);
         body.put("type", type);
         if(properties != null){
+            JSONObject propjson = (JSONObject) parser.parse(properties);
             body.put("properties", propjson);
         }
         response = execute(body, "apix/v1/nodes", "POST");
@@ -131,5 +135,31 @@ public class Controller {
 
 
         return nodeRef;
+    }
+
+    public String setContent(String nodeRef, String filename) throws IOException, UnirestException {
+        String[] splitRef = Utils.splitNodeRef(nodeRef);
+        String url = "apix/v1/nodes/"+splitRef[0]+"/"+splitRef[1]+"/"+splitRef[2]+"/content";
+        return executePut(filename, url);
+
+        // Version avec Apache HTTP Client -> resultat identique
+        // return executeHttpClient(filename, url);
+    }
+
+    /**
+     * Send a file with the PUT HTTP Method
+     *
+     * @param filename
+     * @param url
+     * @return
+     * @throws IOException
+     * @throws UnirestException
+     */
+    private String executePut(String filename, String url) throws IOException, UnirestException {
+        return Unirest.put(hosturl+url)
+                .basicAuth("admin", "admin")
+                .header("accept", "application/json")
+                .field("file", new File(filename))
+                .asJson().getBody().toString();
     }
 }
