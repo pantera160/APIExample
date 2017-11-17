@@ -26,7 +26,7 @@ public class REST {
 
     @RequestMapping("/1")
     public String createNewDocumentExample() throws ParseException, UnirestException, IOException {
-        return controller.createNewDoc("/app:company_home/cm:VDL", "NewContentUploadTest", "{http://www.alfresco.org/model/content/1.0}content");
+        return controller.createNewDoc("/app:company_home/cm:VDL", "NewContentUploadTest44", "{http://www.alfresco.org/model/content/1.0}content");
     }
 
     @RequestMapping("/1/{name}")
@@ -80,5 +80,10 @@ public class REST {
         return controller.setContent(nodeRef,"D://out.xml");
     }
 
+    @RequestMapping("/8")
+    public String setContent2() throws ParseException, UnirestException, IOException {
+        //String nodeRef = this.createNewDocumentExample();
+        return controller.setContentPost("","D://test.txt");
+    }
 
 }

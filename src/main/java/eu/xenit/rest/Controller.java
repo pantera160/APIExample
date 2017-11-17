@@ -72,11 +72,11 @@ public class Controller {
      */
     private String executePut(String filename, String url) throws IOException, UnirestException {
         Path path = Paths.get(filename);
-        byte[] data = Files.readAllBytes(path);
+        //byte[] data = Files.readAllBytes(path);
         HttpResponse<JsonNode> jsonresponse = Unirest.put(hosturl+url)
                 .basicAuth("admin", "admin")
                 .header("accept", "application/json")
-                .field("file", data, null)
+                .field("file", new File(filename))
                 // .body(data) // Same problem
                 .asJson();
 
@@ -90,6 +90,18 @@ public class Controller {
 
         // Version avec Apache HTTP Client -> resultat identique
         // return executeHttpClient(filename, url);
+    }
+
+    public String setContentPost(String nodeRef, String filename) throws IOException, UnirestException {
+
+        return Unirest.post(hosturl + "apix/v1/nodes/upload")
+                .basicAuth("admin", "admin")
+                .header("accept", "application/json")
+                .field("parent", "workspace://SpacesStore/65285809-73b2-4434-b258-8eddb55d1369")
+                .field("type", "cm:content")
+                .field("file", new File(filename))//"/home/willem/devXenit/apix-examples/build/resources/test/test.txt"
+                .asJson().toString();
+       // System.out.println(result.getBody());
     }
 
     /*
