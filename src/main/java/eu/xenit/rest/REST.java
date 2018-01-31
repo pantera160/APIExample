@@ -4,12 +4,11 @@ import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.xenit.utils.Utils;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.util.AntPathMatcher;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.HandlerMapping;
 
-import javax.validation.constraints.NotNull;
+import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
 import java.io.IOException;
 
@@ -26,17 +25,18 @@ public class REST {
 
     @RequestMapping("/1")
     public String createNewDocumentExample() throws ParseException, UnirestException, IOException {
-        return controller.createNewDoc("/app:company_home/cm:VDL", "NewContentUploadTest44", "{http://www.alfresco.org/model/content/1.0}content");
+        return controller.createNewDoc("/app:company_home/cm:VDL/vdletranger:testOD", "testUploadOD.txt", "{http://www.alfresco.org/model/content/1.0}content");
     }
 
-    @RequestMapping("/1/{name}")
-    public String createNewDocumentExample(@PathVariable(value = "name", required = false)
-                                           @NotNull final String name) throws
+
+    @RequestMapping("/1/{name}/{path}")
+    public String createNewDocumentExample(@PathVariable(value = "name", required = false) @NotNull final String name, @PathVariable(value = "path", required = false) @NotNull final String pathname ) throws
             ParseException,
             UnirestException, IOException {
-        return controller.createNewDoc("/app:company_home/cm:VDL", name,
-                "{http://www.alfresco.org/model/content/1.0}content");
+        return controller.createNewDoc(pathname, name,"{http://www.alfresco.org/model/content/1.0}content");
     }
+
+
 
     @RequestMapping("/2")
     public String searchNodes() throws ParseException, UnirestException, IOException {
@@ -65,8 +65,8 @@ public class REST {
 
     @RequestMapping("/5")
     public String createDocWithCats() throws ParseException, UnirestException, IOException {
-        String catids = controller.getCathRefs("Contrôle interne,Stratégie,Logement");
-        return controller.createDocWithProp("/app:company_home/cm:VDL", "ODCatTestDoc4", "{http://vdl.liege.be/model/content/1.0/fin}documentrole", "{\"vdl:vdlmissionprop\":[" + Utils.reformat(catids) + "]}");
+        String catids = controller.getCathRefs("Contrôle interne");
+        return controller.createDocWithProp("/app:company_home/cm:VDL", "ODCatTestDoc5", "{http://vdl.liege.be/model/content/1.0/fin}documentrole", "{\"vdl:vdlmissionprop\":[" + Utils.reformat(catids) + "]}");
     }
 
     @RequestMapping("/6")
@@ -74,16 +74,28 @@ public class REST {
         return controller.setMetadata("workspace://SpacesStore/c8d668f6-ae63-47e0-bb95-435da673b8a8");
     }
 
-    @RequestMapping("/7")
-    public String setContent() throws ParseException, UnirestException, IOException {
-        String nodeRef = this.createNewDocumentExample();
-        return controller.setContent(nodeRef,"D://out.xml");
+    // @RequestMapping("/7/{path}")
+    @RequestMapping(method = RequestMethod.GET, path = "/7/**")
+    @NotNull
+    public @ResponseBody String setContent(HttpServletRequest request) throws ParseException, UnirestException, IOException {
+        String pathname = extractFilePath(request);
+        String nodeRef = this.createNewDocumentExample("testDOC.txt", pathname);
+        return controller.setContentWithPut(nodeRef,"D://out.xml");
     }
 
     @RequestMapping("/8")
     public String setContent2() throws ParseException, UnirestException, IOException {
         //String nodeRef = this.createNewDocumentExample();
         return controller.setContentPost("","D://test.txt");
+    }
+
+    private static String extractFilePath(HttpServletRequest request) {
+        String path = (String) request.getAttribute(
+                HandlerMapping.PATH_WITHIN_HANDLER_MAPPING_ATTRIBUTE);
+        String bestMatchPattern = (String) request.getAttribute(
+                HandlerMapping.BEST_MATCHING_PATTERN_ATTRIBUTE);
+        AntPathMatcher apm = new AntPathMatcher();
+        return apm.extractPathWithinPattern(bestMatchPattern, path);
     }
 
 }
