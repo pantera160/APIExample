@@ -1,15 +1,18 @@
 package eu.xenit.rest;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
-import eu.xenit.utils.Utils;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.util.AntPathMatcher;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.HandlerMapping;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.validation.constraints.NotNull;
+
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
 import java.io.IOException;
 
 /**
@@ -25,6 +28,7 @@ public class REST {
 
     @RequestMapping("/1")
     public String createNewDocumentExample() throws ParseException, UnirestException, IOException {
+
         return controller.createNewDoc("/app:company_home/cm:VDL/vdletranger:testOD", "testUploadOD.txt", "{http://www.alfresco.org/model/content/1.0}content");
     }
 
@@ -34,6 +38,7 @@ public class REST {
             ParseException,
             UnirestException, IOException {
         return controller.createNewDoc(pathname, name,"{http://www.alfresco.org/model/content/1.0}content");
+
     }
 
 
@@ -60,19 +65,21 @@ public class REST {
 
     @RequestMapping("/4")
     public String getCategorieRefs() throws ParseException, UnirestException, IOException {
-        return controller.getCathRefs("Contrôle interne");
+        return controller.getCathRefs("Contrôle interne,Stratégie,Logement");
     }
 
     @RequestMapping("/5")
     public String createDocWithCats() throws ParseException, UnirestException, IOException {
         String catids = controller.getCathRefs("Contrôle interne");
         return controller.createDocWithProp("/app:company_home/cm:VDL", "ODCatTestDoc5", "{http://vdl.liege.be/model/content/1.0/fin}documentrole", "{\"vdl:vdlmissionprop\":[" + Utils.reformat(catids) + "]}");
+
     }
 
     @RequestMapping("/6")
     public String setNewMetadata() throws ParseException, UnirestException, IOException {
         return controller.setMetadata("workspace://SpacesStore/c8d668f6-ae63-47e0-bb95-435da673b8a8");
     }
+
 
     // @RequestMapping("/7/{path}")
     @RequestMapping(method = RequestMethod.GET, path = "/7/**")
@@ -97,5 +104,6 @@ public class REST {
         AntPathMatcher apm = new AntPathMatcher();
         return apm.extractPathWithinPattern(bestMatchPattern, path);
     }
+
 
 }
