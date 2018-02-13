@@ -2,6 +2,8 @@ package eu.xenit.utils;
 
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * Created by Thomas S on 05/10/2017.
  */
@@ -23,8 +25,14 @@ public class Utils {
         for (String cat : catids.split(",")) {
             res += "\""+cat.trim()+"\",";
         }
-        System.out.println(res.substring(0,res.lastIndexOf(",")));
         return res.substring(0,res.lastIndexOf(","));
     }
 
+    public static String reformat(List<String> natures) {
+        String res = "";
+        for (String cat : natures) {
+            res += "\""+cat.trim()+"\",";
+        }
+        return res.substring(0,res.lastIndexOf(","));
+    }
 }
