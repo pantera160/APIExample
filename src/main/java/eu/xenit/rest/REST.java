@@ -1,6 +1,7 @@
 package eu.xenit.rest;
 
 import com.mashape.unirest.http.exceptions.UnirestException;
+import eu.xenit.utils.Utils;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
 
@@ -70,8 +71,9 @@ public class REST {
 
     @RequestMapping("/5")
     public String createDocWithCats() throws ParseException, UnirestException, IOException {
-        String catids = controller.getCathRefs("Contrôle interne");
-        return controller.createDocWithProp("/app:company_home/cm:VDL", "ODCatTestDoc5", "{http://vdl.liege.be/model/content/1.0/fin}documentrole", "{\"vdl:vdlmissionprop\":[" + Utils.reformat(catids) + "]}");
+        String catids = Utils.reformat(controller.getCathRefs("Bon de commande"));
+        System.out.println(catids);
+        return controller.createDocWithProp("/app:company_home/cm:VDL", "TestDocCat", "{http://vdl.liege.be/model/content/1.0/fin}documentrole", "{\"vdl:vdlnatureprop\":["+catids+"]}");
 
     }
 
@@ -93,7 +95,7 @@ public class REST {
     @RequestMapping("/8")
     public String setContent2() throws ParseException, UnirestException, IOException {
         //String nodeRef = this.createNewDocumentExample();
-        return controller.setContentPost("","D://test.txt");
+        return controller.setContentPost("workspace://SpacesStore/0bf9b981-d054-4bb8-a9a1-691c188d6213","D://test.txt");
     }
 
     private static String extractFilePath(HttpServletRequest request) {

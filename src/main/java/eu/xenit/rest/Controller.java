@@ -7,6 +7,7 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import eu.xenit.utils.Utils;
 import org.json.simple.JSONArray;
+import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.stereotype.Component;
@@ -24,6 +25,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Created by Thomas S on 03/10/2017.
@@ -46,28 +48,6 @@ public class Controller {
         return jsonresponse.getBody().toString();
     }
 
-    /**
-     * Send a file with the PUT HTTP Method
-     *
-     * @param filename
-     * @param url
-     * @return
-     * @throws IOException
-     * @throws UnirestException
-     */
-    public String executePut(String filename, String url) throws IOException, UnirestException {
-        // Path path = Paths.get(filename);
-        //byte[] data = Files.readAllBytes(path);
-        HttpResponse<JsonNode> jsonresponse = Unirest.put(hosturl + url)
-                .basicAuth("admin", "admin")
-                .header("accept", "application/json")
-                .field("file", new File(filename))
-                // .body(data) // Same problem
-                .asJson();
-
-        return jsonresponse.getBody().toString();
-    }
-
     public String setContentWithPut(String nodeRef, String filename) throws IOException, UnirestException {
         String[] splitRef = Utils.splitNodeRef(nodeRef);
         String url = "apix/v1/nodes/" + splitRef[0] + "/" + splitRef[1] + "/" + splitRef[2] + "/content";
@@ -79,16 +59,16 @@ public class Controller {
 
     public String setContentPost(String nodeRef, String filename) throws IOException, UnirestException {
 
-        HttpResponse<JsonNode> jsonresponse = Unirest.post(hosturl + "apix/v1/nodes/upload")
+        HttpResponse<String> test = Unirest.post(hosturl + "apix/v2/nodes/upload")
                 .basicAuth("admin", "admin")
                 .header("accept", "application/json")
                 .field("parent", nodeRef)
-                .field("type", "cm:content")
+                .field("type", "vdl:document")
+                .field("properties", "[{\"qname\":\"vdl:vdlnatureprop\",\"value\":\"workspace://SpacesStore/a53b8ae5-9ee3-4bb8-ba17-b2fcda2ddc25\"}]")
                 .field("file", new File(filename))//"/home/willem/devXenit/apix-examples/build/resources/test/test.txt"
-                .asJson();
+                .asString();
 //        System.out.println("## i d ### "  + jsonresponse.getBody().getObject().get("id") + "#####");
-        return (String) ((org.json.JSONObject)jsonresponse.getBody().getObject().get("metadata")).get("id");
-
+        return test.getBody();
     }
 
     /*
@@ -124,7 +104,7 @@ public class Controller {
 
     public String getCathRefs(String missions) throws IOException, UnirestException, ParseException {
 
-        List<String> cathRefs = getMissionsOrNature(missions, true);
+        List<String> cathRefs = getMissionsOrNature(missions, false);
 
 
         String reponseString = "";
@@ -164,7 +144,6 @@ public class Controller {
             body.put("query", query);
             System.out.println(body);
             String response = execute(body, "apix/v1/search", "POST");
-            JSONParser parser = new JSONParser();
             JSONObject responseJSON = (JSONObject) parser.parse(response);
 
             // System.out.println("Body search :" + body);
@@ -176,7 +155,7 @@ public class Controller {
         for(String ref:cathRefs){
             reponseString += ref+", ";
         }
-        return reponseString;
+        return cathRefs;
     }
 
     public String search(String query) throws ParseException, IOException, UnirestException {
@@ -242,7 +221,7 @@ public class Controller {
             JSONObject propjson = (JSONObject) parser.parse(properties);
             body.put("properties", propjson);
         }
-        response = execute(body, "apix/v1/nodes", "POST");
+        response = execute(body, "apix/v2/nodes", "POST");
 
         responseJSON = (JSONObject) parser.parse(response);
         // System.out.println(responseJSON.toJSONString());
@@ -252,13 +231,13 @@ public class Controller {
         return nodeRef;
     }
 
-    public String setContent(String nodeRef, String filename) throws IOException, UnirestException {
+    public String setContent(String nodeRef, String filename) throws IOException, UnirestException, ParseException {
         String[] splitRef = Utils.splitNodeRef(nodeRef);
 
         JSONParser parser = new JSONParser();
         String url = "apix/v1/nodes/" + splitRef[0] + "/" + splitRef[1] + "/" + splitRef[2] + "/metadata";
         String JSONString = "{\n" +
-                "  \"propertiesToSet\": {\"" + property + "\":" + jsonValue + "}\n" +
+                //"  \"propertiesToSet\": {\"" + property + "\":" + jsonValue + "}\n" +
                 "}";
         System.out.println("JSONString:" + JSONString);
         JSONObject body = (JSONObject) parser.parse(JSONString);
